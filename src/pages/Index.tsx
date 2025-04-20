@@ -1,197 +1,201 @@
-import React from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { fetchProducts } from "@/services/api";
 import { Button } from "@/components/ui/button";
-import { CartProvider } from "@/context/CartContext";
-import ProductCard from "@/components/ProductCard";
 import Header from "@/components/Header";
-import { ArrowRight, ShoppingBag, TruckIcon, CreditCard, LifeBuoy } from "lucide-react";
+import Footer from "@/components/Footer";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import ProductCard from "@/components/ProductCard";
+import SaleCountdown from "@/components/SaleCountdown";
+import CategoryCard from "@/components/CategoryCard";
+import { useProducts } from "@/hooks/useProducts";
 
-const HomePage = () => {
+const IndexPage = () => {
   const navigate = useNavigate();
-  const { data: products = [], isLoading } = useQuery({
-    queryKey: ["products"],
-    queryFn: fetchProducts,
-  });
+  const { data: products, isLoading } = useProducts();
+  
+  // Get featured products (first 6)
+  const featuredProducts = products?.slice(0, 6) || [];
+  
+  // Get new arrivals (random 4)
+  const newArrivals = products
+    ? [...products]
+        .sort(() => 0.5 - Math.random())
+        .slice(0, 4)
+    : [];
+    
+  // Get sale products (products with discount)
+  const saleProducts = products
+    ? products
+        .filter((product) => product.discount && product.discount > 0)
+        .slice(0, 6)
+    : [];
 
-  const featuredProducts = products.slice(0, 4);
+  // Categories
+  const categories = [
+    { id: 1, name: "Electronics", image: "/categories/electronics.webp", slug: "electronics" },
+    { id: 2, name: "Fashion", image: "/categories/fashion.webp", slug: "fashion" },
+    { id: 3, name: "Home & Garden", image: "/categories/home.webp", slug: "home-garden" },
+    { id: 4, name: "Beauty", image: "/categories/beauty.webp", slug: "beauty" },
+  ];
 
-  const handleViewProduct = (product: any) => {
-    navigate(`/product/${product.id}`);
-  };
+  // Scroll to top on page load
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
-    <CartProvider>
-      <div className="flex flex-col min-h-screen">
-        <Header onOpenCart={() => {}} />
+    <div className="min-h-screen bg-shop-light">
+      <Header />
+      
+      {/* Hero Section */}
+      <section className="relative bg-shop-primary h-[500px] overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-shop-dark/80 to-transparent z-10"></div>
+        <div className="absolute inset-0 bg-[url('/hero-bg.webp')] bg-cover bg-center transform scale-105 opacity-50"></div>
         
-        {/* Hero Section */}
-        <section className="relative bg-gradient-to-r from-shop-light via-white to-shop-light">
-          <div className="container mx-auto px-4 py-16 md:py-28">
-            <div className="max-w-3xl">
-              <span className="inline-block px-4 py-1 bg-shop-primary/10 text-shop-primary rounded-full text-sm font-medium mb-4">
-                Premium Shopping Experience
-              </span>
-              <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-shop-primary to-shop-secondary bg-clip-text text-transparent leading-tight">
-                Discover Amazing Products at ShopVista
-              </h1>
-              <p className="text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed">
-                Your one-stop destination for high-quality products at unbeatable prices.
-              </p>
-              <div className="flex flex-wrap gap-4">
-                <Button 
-                  onClick={() => navigate('/products')}
-                  className="bg-shop-primary hover:bg-shop-secondary text-white px-8 py-6 text-lg rounded-full transition-transform hover:scale-105"
-                >
-                  Browse Products <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-                <Button 
-                  variant="outline"
-                  onClick={() => navigate('/products')}
-                  className="border-shop-primary text-shop-primary hover:bg-shop-primary/10 px-8 py-6 text-lg rounded-full"
-                >
-                  Today's Deals
-                </Button>
-              </div>
+        <div className="container h-full flex items-center relative z-20">
+          <div className="max-w-2xl text-white">
+            <h1 className="text-5xl md:text-6xl font-bold mb-4">Spring Collection <br/>Now Available</h1>
+            <p className="text-xl mb-8 opacity-90">Discover the latest trends and elevate your style with our exclusive spring collection.</p>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button size="lg" onClick={() => navigate("/products")} className="bg-white text-shop-primary hover:bg-white/90 hover:text-shop-primary font-medium">
+                Shop Now
+              </Button>
+              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/20 font-medium">
+                View Collections
+              </Button>
             </div>
           </div>
-          <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-gray-50 to-transparent"></div>
-        </section>
-
-        {/* Features */}
-        <section className="py-12 bg-white">
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              <div className="flex flex-col items-center text-center p-6 rounded-xl bg-shop-light/30 hover:bg-shop-light transition-colors duration-300">
-                <ShoppingBag className="h-10 w-10 text-shop-primary mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Quality Products</h3>
-                <p className="text-gray-600">Handpicked items that meet our high standards</p>
-              </div>
-              <div className="flex flex-col items-center text-center p-6 rounded-xl bg-shop-light/30 hover:bg-shop-light transition-colors duration-300">
-                <TruckIcon className="h-10 w-10 text-shop-primary mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Fast Delivery</h3>
-                <p className="text-gray-600">Quick shipping to get your items to you promptly</p>
-              </div>
-              <div className="flex flex-col items-center text-center p-6 rounded-xl bg-shop-light/30 hover:bg-shop-light transition-colors duration-300">
-                <CreditCard className="h-10 w-10 text-shop-primary mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Secure Payment</h3>
-                <p className="text-gray-600">Safe transactions with multiple payment options</p>
-              </div>
-              <div className="flex flex-col items-center text-center p-6 rounded-xl bg-shop-light/30 hover:bg-shop-light transition-colors duration-300">
-                <LifeBuoy className="h-10 w-10 text-shop-primary mb-4" />
-                <h3 className="text-lg font-semibold mb-2">24/7 Support</h3>
-                <p className="text-gray-600">Our team is always ready to assist you</p>
-              </div>
-            </div>
+        </div>
+      </section>
+      
+      {/* Categories Section */}
+      <section className="py-16 bg-white">
+        <div className="container">
+          <h2 className="text-3xl font-bold mb-8 text-center">Shop by Category</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {categories.map((category) => (
+              <CategoryCard 
+                key={category.id} 
+                category={category} 
+                onClick={() => navigate(`/products?category=${category.slug}`)}
+              />
+            ))}
           </div>
-        </section>
-
-        {/* Featured Products */}
-        <section className="py-16 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
-              <span className="inline-block px-4 py-1 bg-shop-primary/10 text-shop-primary rounded-full text-sm font-medium mb-4">
-                Our Selection
-              </span>
-              <h2 className="text-3xl md:text-4xl font-bold mb-4 text-center">Featured Products</h2>
-              <p className="text-gray-600 max-w-2xl mx-auto">
-                Explore our most popular items handpicked for quality and value.
-              </p>
+        </div>
+      </section>
+      
+      {/* Featured Products */}
+      <section className="py-16">
+        <div className="container">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-3xl font-bold">Featured Products</h2>
+            <Button variant="ghost" onClick={() => navigate("/products")}>
+              View All
+            </Button>
+          </div>
+          
+          {isLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="bg-gray-200 rounded-lg h-[300px]"></div>
+              ))}
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {isLoading ? (
-                Array(4).fill(0).map((_, i) => (
-                  <div key={i} className="animate-pulse">
-                    <div className="bg-gray-200 aspect-square rounded-lg mb-4"></div>
-                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {featuredProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+      
+      {/* Sale Banner */}
+      {saleProducts.length > 0 && (
+        <section className="py-16 bg-shop-primary/10">
+          <div className="container">
+            <div className="bg-gradient-to-r from-shop-primary to-shop-secondary rounded-2xl overflow-hidden">
+              <div className="grid grid-cols-1 lg:grid-cols-2 items-center">
+                <div className="p-8 lg:p-12">
+                  <span className="inline-block bg-white px-4 py-1 rounded-full text-shop-primary font-medium text-sm mb-4">
+                    Limited Time Offer
+                  </span>
+                  <h2 className="text-4xl text-white font-bold mb-4">End of Season Sale</h2>
+                  <p className="text-white/80 text-lg mb-6">Get up to 50% off on selected items.</p>
+                  
+                  <div className="mb-8">
+                    <SaleCountdown />
                   </div>
-                ))
-              ) : (
-                featuredProducts.map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    onViewDetails={handleViewProduct}
-                  />
-                ))
-              )}
+                  
+                  <Button size="lg" onClick={() => navigate("/products")} className="bg-white text-shop-primary hover:bg-white/90">
+                    Shop the Sale
+                  </Button>
+                </div>
+                
+                <div className="p-8 lg:p-0 hidden lg:block">
+                  <div className="relative aspect-[4/3] overflow-hidden rounded-l-2xl">
+                    <img 
+                      src="/sale-banner.webp" 
+                      alt="Sale Banner" 
+                      className="absolute inset-0 h-full w-full object-cover"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="text-center mt-12">
-              <Button
-                onClick={() => navigate('/products')}
-                className="bg-shop-primary hover:bg-shop-secondary text-white px-6 py-2 rounded-full"
-              >
-                View All Products <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+            
+            {/* Sale Products Carousel */}
+            <div className="mt-12">
+              <h3 className="text-2xl font-bold mb-6">On Sale Now</h3>
+              <ScrollArea className="w-full whitespace-nowrap rounded-lg p-4 border border-gray-200 bg-white">
+                <div className="flex space-x-6 pb-2">
+                  {saleProducts.map((product) => (
+                    <div key={product.id} className="w-[300px] shrink-0">
+                      <ProductCard product={product} variant="horizontal" />
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
             </div>
           </div>
         </section>
-
-        {/* CTA Section */}
-        <section className="py-16 bg-gradient-to-r from-shop-primary/10 to-shop-secondary/10">
-          <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto text-center">
-              <h2 className="text-3xl font-bold mb-6">Ready to Start Shopping?</h2>
-              <p className="text-lg text-gray-600 mb-8">
-                Explore our collection and find the perfect items for your needs.
-              </p>
-              <Button 
-                onClick={() => navigate('/products')}
-                className="bg-shop-primary hover:bg-shop-secondary text-white px-8 py-6 text-lg rounded-full transition-transform hover:scale-105"
-              >
-                Shop Now <ShoppingBag className="ml-2 h-5 w-5" />
-              </Button>
+      )}
+      
+      {/* New Arrivals */}
+      <section className="py-16 bg-white">
+        <div className="container">
+          <h2 className="text-3xl font-bold mb-8">New Arrivals</h2>
+          
+          {isLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-pulse">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="bg-gray-200 rounded-lg h-[350px]"></div>
+              ))}
             </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {newArrivals.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          )}
+          
+          <div className="mt-8 text-center">
+            <Button 
+              variant="outline" 
+              size="lg" 
+              onClick={() => navigate("/products")}
+              className="border-shop-primary text-shop-primary hover:bg-shop-primary hover:text-white"
+            >
+              View All Products
+            </Button>
           </div>
-        </section>
-
-        {/* Footer */}
-        <footer className="bg-gray-100 py-8 mt-auto">
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-              <div>
-                <h3 className="font-bold text-lg mb-4">ShopVista</h3>
-                <p className="text-gray-600">Your premium shopping destination with the best products at competitive prices.</p>
-              </div>
-              <div>
-                <h3 className="font-bold text-lg mb-4">Quick Links</h3>
-                <ul className="space-y-2">
-                  <li><Link to="/" className="text-gray-600 hover:text-shop-primary transition-colors">Home</Link></li>
-                  <li><Link to="/products" className="text-gray-600 hover:text-shop-primary transition-colors">Products</Link></li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="font-bold text-lg mb-4">Contact</h3>
-                <p className="text-gray-600">Email: support@shopvista.com</p>
-                <p className="text-gray-600">Phone: +1 (555) 123-4567</p>
-              </div>
-            </div>
-            <div className="border-t pt-6 text-center text-sm text-gray-600">
-              <p>© 2025 ShopVista. All rights reserved.</p>
-            </div>
-          </div>
-        </footer>
-      </div>
-    </CartProvider>
+        </div>
+      </section>
+      
+      <Footer />
+    </div>
   );
 };
 
-export default HomePage;
-
-const Link = ({ to, children, className = "" }) => {
-  const navigate = useNavigate();
-  return (
-    <a 
-      href={to} 
-      className={className}
-      onClick={(e) => {
-        e.preventDefault();
-        navigate(to);
-      }}
-    >
-      {children}
-    </a>
-  );
-};
+export default IndexPage;
