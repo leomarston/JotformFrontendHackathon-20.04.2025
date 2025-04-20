@@ -3,13 +3,28 @@
 ## User Information
 Please fill in your information after forking this repository:
 
-- **Name**: [Your Name]
+- **Name**: Ahmet Yağız Sarıdoğan
 
 ## Project Description
-[Add a brief description of your project here]
+This is a React-based web application for the Jotform Frontend Hackathon. The project will be developed according to the specifications provided at the beginning of the hackathon.
 
 ## Getting Started
-[Add instructions for setting up and running the project]
+To run this project locally:
+
+1. Clone the repository
+2. Install dependencies: 
+   npm install
+  
+3. Start the development server:
+   npm start
+
+4. Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+
+## Technology Stack
+
+- React
+- JavaScript/TypeScript
+- CSS/SCSS
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details. 
